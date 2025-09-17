@@ -355,14 +355,12 @@
         </div>
 
         <div class="content">
-            <!-- Navigation Links -->
             <div class="nav-links">
                 <a href="index.php">🏠 Dashboard</a>
                 <a href="add_user_form.php">👤 Add User</a>
                 <a href="activity_logs.php" style="background: #667eea; color: white;">📊 Activity Logs</a>
             </div>
 
-            <!-- Stats -->
             <div class="stats">
                 <div class="stat-card">
                     <div class="stat-number" id="totalLogs">-</div>
@@ -378,7 +376,6 @@
                 </div>
             </div>
 
-            <!-- Filters -->
             <div class="filters">
                 <h3>🔍 Filter Logs</h3>
                 <div class="filter-row">
@@ -414,7 +411,6 @@
                 </div>
             </div>
 
-            <!-- Loading and Error Messages -->
             <div id="loading" class="loading" style="display: none;">
                 <p>⏳ Loading activity logs...</p>
             </div>
@@ -422,7 +418,6 @@
             <div id="error" class="error" style="display: none;"></div>
             <div id="success" class="success" style="display: none;"></div>
 
-            <!-- Logs Table -->
             <div class="logs-table">
                 <div class="table-container">
                     <table id="logsTable">
@@ -435,19 +430,13 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="logsTableBody">
-                            <!-- Logs will be populated here -->
-                        </tbody>
+                        <tbody id="logsTableBody"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Pagination -->
-            <div class="pagination" id="pagination" style="display: none;">
-                <!-- Pagination will be populated here -->
-            </div>
+            <div class="pagination" id="pagination" style="display: none;"></div>
 
-            <!-- No logs message -->
             <div id="noLogs" class="no-logs" style="display: none;">
                 <i>📝</i>
                 <h3>No Activity Logs Found</h3>

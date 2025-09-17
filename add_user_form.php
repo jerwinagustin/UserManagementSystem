@@ -163,7 +163,6 @@
             <div id="message"></div>
             
             <form id="addUserForm">
-                <!-- Account Information -->
                 <div class="form-section">
                     <h3>Account Information</h3>
                     
@@ -198,7 +197,6 @@
                     </div>
                 </div>
                 
-                <!-- Profile Information -->
                 <div class="form-section">
                     <h3>Profile Information</h3>
                     
@@ -234,7 +232,6 @@
                     </div>
                 </div>
                 
-                <!-- Role Assignment -->
                 <div class="form-section">
                     <h3>Role Assignment</h3>
                     <div class="form-group">

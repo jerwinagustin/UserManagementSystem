@@ -1,5 +1,4 @@
 <?php
-// delete_log.php - Delete a specific activity log entry (admin function)
 include '../config.php';
 
 header('Content-Type: application/json');
@@ -12,11 +11,9 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['POST', 'DELETE'])) {
 $logIdInput = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-    // Support query parameter for simple clients
     if (isset($_GET['ActivityLogID'])) {
         $logIdInput = (int)$_GET['ActivityLogID'];
     } else {
-        // Check for JSON body
         $raw = file_get_contents('php://input');
         if ($raw) {
             $decoded = json_decode($raw, true);
@@ -29,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
             }
         }
     }
-} else { // POST
+} else {
     $raw = file_get_contents('php://input');
     $decoded = json_decode($raw, true);
     if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
@@ -49,7 +46,6 @@ if (!$logIdInput) {
 try {
     $log_id = $logIdInput;
     
-    // Check if log exists and get details
     $check_log = $conn->prepare("SELECT al.ActivityLogID, al.UserID, al.Action, al.Details, al.Timestamp, u.Username 
                                 FROM activitylogs al 
                                 LEFT JOIN users u ON al.UserID = u.UserID 
@@ -66,7 +62,6 @@ try {
     $log_data = $result->fetch_assoc();
     $check_log->close();
     
-    // Delete the activity log
     $delete_stmt = $conn->prepare("DELETE FROM activitylogs WHERE ActivityLogID = ?");
     $delete_stmt->bind_param("i", $log_id);
     
@@ -81,7 +76,6 @@ try {
         throw new Exception("No activity log was deleted");
     }
     
-    // Log this deletion (meta-logging)
     if ($log_data['UserID']) {
         log_activity($log_data['UserID'], 'Activity Log Deleted', 
                     "Deleted log entry: {$log_data['Action']} from {$log_data['Timestamp']}");

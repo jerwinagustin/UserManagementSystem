@@ -1,5 +1,4 @@
 <?php
-// index.php - Integrated front-end + PHP for User Management System (Users Table focused)
 require_once __DIR__ . '/config.php';
 
 // Pre-fetch basic user stats & list (server-side render fallback)
@@ -580,13 +579,10 @@ try {
                 </tbody>
             </table>
             
-            <div id="activityLogsPagination" style="text-align: center; margin-top: 20px;">
-                <!-- Pagination will be populated here -->
-            </div>
+            <div id="activityLogsPagination" style="text-align: center; margin-top: 20px;"></div>
         </div>
     </div>
 
-    <!-- Add User Modal -->
     <div id="addUserModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="hideModal('addUserModal')">&times;</span>
@@ -622,7 +618,6 @@ try {
         </div>
     </div>
 
-    <!-- Add Role Modal -->
     <div id="addRoleModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="hideModal('addRoleModal')">&times;</span>
@@ -643,7 +638,6 @@ try {
         </div>
     </div>
 
-    <!-- Manage User Roles Modal -->
     <div id="userRolesModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="hideModal('userRolesModal')">&times;</span>
@@ -660,7 +654,6 @@ try {
         </div>
     </div>
 
-    <!-- User Profile Modal -->
     <div id="userProfileModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="hideModal('userProfileModal')">&times;</span>
@@ -743,9 +736,7 @@ try {
                         });
                     }
                 })
-                .catch(err => {
-                    console.error('Error loading roles for dropdown:', err);
-                });
+                .catch(() => {});
         }
         function hideModal(id) { document.getElementById(id).style.display = 'none'; }
         window.onclick = function (e) { document.querySelectorAll('.modal').forEach(m => { if (e.target === m) { m.style.display = 'none'; } }); };
@@ -785,7 +776,7 @@ try {
         }
 
         // Load users (AJAX refresh)
-    function loadUsers() { fetch('users/get_users.php').then(r => r.json()).then(data => { if (!data.success) return; const tbody = document.getElementById('usersTableBody'); tbody.innerHTML = ''; if (data.users.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No users found</td></tr>'; return; } data.users.forEach(u => { const safeName = JSON.stringify(u.Username); const tr = document.createElement('tr'); tr.dataset.userId = u.UserID; tr.innerHTML = `<td>${u.UserID}</td><td>${escapeHtml(u.Username)}</td><td>${escapeHtml(u.Email)}</td><td><span class=\"status-badge status-${u.Status.toLowerCase() === 'active' ? 'active' : 'inactive'}\">${escapeHtml(u.Status)}</span></td><td>${escapeHtml(u.CreatedAt)}</td><td class=\"action-buttons\"><button class='btn btn-small btn-secondary' onclick='editUser(${u.UserID})'>Edit</button><button class='btn btn-small btn-success' onclick='manageUserRoles(${u.UserID})'>Roles</button><button class='btn btn-small btn-danger' onclick='deleteUserReal(${u.UserID})'>Delete</button></td><td><button class='btn btn-small' style=\"background:linear-gradient(135deg,#805ad5,#6b46c1)\" onclick='viewUserProfile(${u.UserID})'>View Profile</button></td>`; tbody.appendChild(tr); }); updateDashboardStats(); }).catch(err => console.log('Load users error', err)); }
+    function loadUsers() { fetch('users/get_users.php').then(r => r.json()).then(data => { if (!data.success) return; const tbody = document.getElementById('usersTableBody'); tbody.innerHTML = ''; if (data.users.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No users found</td></tr>'; return; } data.users.forEach(u => { const safeName = JSON.stringify(u.Username); const tr = document.createElement('tr'); tr.dataset.userId = u.UserID; tr.innerHTML = `<td>${u.UserID}</td><td>${escapeHtml(u.Username)}</td><td>${escapeHtml(u.Email)}</td><td><span class=\"status-badge status-${u.Status.toLowerCase() === 'active' ? 'active' : 'inactive'}\">${escapeHtml(u.Status)}</span></td><td>${escapeHtml(u.CreatedAt)}</td><td class=\"action-buttons\"><button class='btn btn-small btn-secondary' onclick='editUser(${u.UserID})'>Edit</button><button class='btn btn-small btn-success' onclick='manageUserRoles(${u.UserID})'>Roles</button><button class='btn btn-small btn-danger' onclick='deleteUserReal(${u.UserID})'>Delete</button></td><td><button class='btn btn-small' style=\"background:linear-gradient(135deg,#805ad5,#6b46c1)\" onclick='viewUserProfile(${u.UserID})'>View Profile</button></td>`; tbody.appendChild(tr); }); updateDashboardStats(); }).catch(() => {}); }
 
         // Profile Page Redirection
         function viewUserProfile(userID) {
@@ -877,7 +868,7 @@ try {
     document.getElementById('profileAvatar') && document.getElementById('profileAvatar').addEventListener('input', function(){ updateAvatarPreview(this.value.trim()); });
 
     // Roles
-    function loadRoles() { fetch('roles/get_roles.php').then(r => r.json()).then(data => { const tbody = document.getElementById('rolesTableBody'); if (!data.success) { tbody.innerHTML = `<tr><td colspan='4' style='text-align:center;color:#c53030;'>${escapeHtml(data.message)}</td></tr>`; return; } if (data.roles.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No roles found</td></tr>'; return; } tbody.innerHTML = ''; data.roles.forEach(role => { const tr = document.createElement('tr'); tr.dataset.roleId = role.RoleID; tr.innerHTML = `<td>${role.RoleID}</td><td>${escapeHtml(role.RoleName)}</td><td>${escapeHtml(role.Description || '')}</td><td class='action-buttons'><button class='btn btn-small btn-secondary' onclick='editRole(${role.RoleID})'>Edit</button><button class='btn btn-small btn-danger' onclick='deleteRoleReal(${role.RoleID})'>Delete</button></td>`; tbody.appendChild(tr); }); filterRoles(); updateDashboardStats(); }).catch(err => { console.log('Load roles error', err); }); }
+    function loadRoles() { fetch('roles/get_roles.php').then(r => r.json()).then(data => { const tbody = document.getElementById('rolesTableBody'); if (!data.success) { tbody.innerHTML = `<tr><td colspan='4' style='text-align:center;color:#c53030;'>${escapeHtml(data.message)}</td></tr>`; return; } if (data.roles.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No roles found</td></tr>'; return; } tbody.innerHTML = ''; data.roles.forEach(role => { const tr = document.createElement('tr'); tr.dataset.roleId = role.RoleID; tr.innerHTML = `<td>${role.RoleID}</td><td>${escapeHtml(role.RoleName)}</td><td>${escapeHtml(role.Description || '')}</td><td class='action-buttons'><button class='btn btn-small btn-secondary' onclick='editRole(${role.RoleID})'>Edit</button><button class='btn btn-small btn-danger' onclick='deleteRoleReal(${role.RoleID})'>Delete</button></td>`; tbody.appendChild(tr); }); filterRoles(); updateDashboardStats(); }).catch(() => {}); }
 
     function filterRoles() { 
         const term = (document.getElementById('roleSearch').value || '').toLowerCase().trim(); 
@@ -1099,9 +1090,8 @@ try {
         }
 
     document.addEventListener('DOMContentLoaded', function () { 
-        console.log('Integrated User & Role Management loaded'); 
         updateDashboardStats(); 
-        loadUsers(); // Load users on page load
+        loadUsers();
     });
     </script>
 </body>

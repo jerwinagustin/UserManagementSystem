@@ -1,5 +1,4 @@
 <?php
-// get_all_logs.php - Retrieve all activity logs with pagination and filtering
 include '../config.php';
 
 header('Content-Type: application/json');
@@ -10,7 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
-    // Get query parameters
     $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
     $limit = isset($_GET['limit']) ? min(100, max(1, (int)$_GET['limit'])) : 20;
     $user_id = isset($_GET['user_id']) ? (int)$_GET['user_id'] : null;
@@ -20,7 +18,6 @@ try {
     
     $offset = ($page - 1) * $limit;
     
-    // Build WHERE clause
     $where_conditions = [];
     $params = [];
     $types = '';
@@ -51,7 +48,6 @@ try {
     
     $where_clause = !empty($where_conditions) ? 'WHERE ' . implode(' AND ', $where_conditions) : '';
     
-    // Count total records
     $count_sql = "SELECT COUNT(*) as total 
                   FROM activitylogs al 
                   LEFT JOIN users u ON al.UserID = u.UserID 
@@ -65,7 +61,6 @@ try {
     $total_records = $count_stmt->get_result()->fetch_assoc()['total'];
     $count_stmt->close();
     
-    // Get logs with user information
     $sql = "SELECT 
                 al.ActivityLogID,
                 al.UserID,
@@ -82,7 +77,6 @@ try {
     
     $stmt = $conn->prepare($sql);
     
-    // Add limit and offset to parameters
     $params[] = $limit;
     $params[] = $offset;
     $types .= 'ii';
@@ -109,7 +103,6 @@ try {
     
     $stmt->close();
     
-    // Calculate pagination info
     $total_pages = ceil($total_records / $limit);
     
     json_response(true, 'Activity logs retrieved successfully', [

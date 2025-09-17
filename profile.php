@@ -1,8 +1,6 @@
 <?php
-// profile.php - User Profile Display and Management Page (as requested in requirements)
 require_once __DIR__ . '/config.php';
 
-// Get user ID from URL parameter (supporting both 'id' and 'user_id' for compatibility)
 $user_id = isset($_GET['id']) ? (int)$_GET['id'] : (isset($_GET['user_id']) ? (int)$_GET['user_id'] : null);
 
 if (!$user_id) {
@@ -15,13 +13,11 @@ if (!$user_id) {
     ");
 }
 
-// Fetch user and profile data by joining Users and Profiles tables
 $user_data = null;
 $profile_data = null;
 $user_roles = [];
 
 try {
-    // Get user and profile information with JOIN
     $user_profile_stmt = $conn->prepare("
         SELECT 
             u.UserID, u.Username, u.Email, u.Status, u.CreatedAt,
@@ -46,7 +42,6 @@ try {
     
     $combined_data = $result->fetch_assoc();
     
-    // Split into user and profile data
     $user_data = [
         'UserID' => $combined_data['UserID'],
         'Username' => $combined_data['Username'],
@@ -55,7 +50,6 @@ try {
         'CreatedAt' => $combined_data['CreatedAt']
     ];
     
-    // Only set profile data if profile exists
     if ($combined_data['ProfileID']) {
         $profile_data = [
             'ProfileID' => $combined_data['ProfileID'],
@@ -70,7 +64,6 @@ try {
     
     $user_profile_stmt->close();
     
-    // Get user roles
     $roles_stmt = $conn->prepare("
         SELECT r.RoleID, r.RoleName, r.Description 
         FROM userroles ur 
@@ -97,7 +90,6 @@ try {
     ");
 }
 
-// Handle form submissions for CRUD operations
 $message = '';
 $message_type = '';
 
@@ -106,7 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $action = $_POST['action'] ?? '';
         
         if ($action === 'create_profile') {
-            // Create new profile
             $full_name = sanitize_input($_POST['full_name']);
             $address = sanitize_input($_POST['address'] ?? '');
             $phone_number = sanitize_input($_POST['phone_number'] ?? '');
@@ -117,7 +108,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Full name must be at least 2 characters long");
             }
             
-            // Validate date format if provided
             if ($date_of_birth && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_of_birth)) {
                 throw new Exception("Date of birth must be in YYYY-MM-DD format");
             }
@@ -131,7 +121,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($create_stmt->execute()) {
                 $message = "Profile created successfully!";
                 $message_type = "success";
-                // Refresh page to show new profile
                 header("Location: profile.php?id=$user_id&created=1");
                 exit;
             } else {
@@ -139,7 +128,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
         } elseif ($action === 'update_profile') {
-            // Update existing profile
             if (!$profile_data) {
                 throw new Exception("Profile does not exist");
             }
@@ -154,7 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Full name must be at least 2 characters long");
             }
             
-            // Validate date format if provided
             if ($date_of_birth && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_of_birth)) {
                 throw new Exception("Date of birth must be in YYYY-MM-DD format");
             }
@@ -169,7 +156,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($update_stmt->execute()) {
                 $message = "Profile updated successfully!";
                 $message_type = "success";
-                // Refresh page to show updated profile
                 header("Location: profile.php?id=$user_id&updated=1");
                 exit;
             } else {
@@ -177,7 +163,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
         } elseif ($action === 'delete_profile') {
-            // Delete profile (but keep user account)
             if (!$profile_data) {
                 throw new Exception("Profile does not exist");
             }
@@ -188,7 +173,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($delete_stmt->execute()) {
                 $message = "Profile deleted successfully!";
                 $message_type = "success";
-                // Refresh page
                 header("Location: profile.php?id=$user_id&deleted=1");
                 exit;
             } else {
@@ -202,7 +186,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Handle URL messages
 if (isset($_GET['created'])) {
     $message = "Profile created successfully!";
     $message_type = "success";
@@ -503,7 +486,6 @@ if (isset($_GET['created'])) {
         </div>
         
         <div class="content">
-            <!-- Back button -->
             <a href="index.php" class="btn btn-secondary">← Back to Dashboard</a>
             
             <?php if ($message): ?>
@@ -512,7 +494,6 @@ if (isset($_GET['created'])) {
                 </div>
             <?php endif; ?>
             
-            <!-- User Account Information -->
             <div class="profile-card">
                 <h3 style="color: #2d3748; margin-bottom: 20px;">Account Information</h3>
                 <div class="info-grid">
@@ -538,7 +519,6 @@ if (isset($_GET['created'])) {
                     </div>
                 </div>
                 
-                <!-- User Roles -->
                 <?php if (!empty($user_roles)): ?>
                     <div class="roles-section">
                         <h3>Assigned Roles</h3>
@@ -551,7 +531,6 @@ if (isset($_GET['created'])) {
                 <?php endif; ?>
             </div>
             
-            <!-- Profile Information -->
             <?php if ($profile_data): ?>
                 <div class="profile-card">
                     <div class="profile-header">
@@ -601,7 +580,6 @@ if (isset($_GET['created'])) {
                     </div>
                 </div>
                 
-                <!-- Update Profile Form -->
                 <div class="form-section">
                     <h3>Update Profile</h3>
                     <form method="POST">
@@ -648,7 +626,6 @@ if (isset($_GET['created'])) {
                 </div>
                 
             <?php else: ?>
-                <!-- No Profile - Create Form -->
                 <div class="no-profile">
                     <h3>No Profile Found</h3>
                     <p>This user doesn't have a profile yet. You can create one below.</p>
@@ -695,7 +672,6 @@ if (isset($_GET['created'])) {
                 </div>
             <?php endif; ?>
             
-            <!-- Activity Logs Section -->
             <div class="form-section">
                 <h3>📊 Activity Logs</h3>
                 <p style="color: #718096; margin-bottom: 20px;">Recent activities for this user</p>
@@ -716,14 +692,10 @@ if (isset($_GET['created'])) {
                                     <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6; color: #495057;">Timestamp</th>
                                 </tr>
                             </thead>
-                            <tbody id="activityLogsTableBody">
-                                <!-- Activity logs will be populated here -->
-                            </tbody>
+                            <tbody id="activityLogsTableBody"></tbody>
                         </table>
                         
-                        <div id="activityLogsPagination" style="text-align: center; margin-top: 15px;">
-                            <!-- Pagination will be populated here -->
-                        </div>
+                        <div id="activityLogsPagination" style="text-align: center; margin-top: 15px;"></div>
                     </div>
                     
                     <div id="noActivityLogs" style="display: none; text-align: center; padding: 30px; color: #718096;">
@@ -740,7 +712,6 @@ if (isset($_GET['created'])) {
         let currentActivityPage = 1;
         const activityLogsPerPage = 10;
         
-        // Load activity logs when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadUserActivityLogs();
         });
